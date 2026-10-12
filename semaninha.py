@@ -289,9 +289,9 @@ def run_query(store: dict, prof: Profile, q: Query, *, quiet: bool = False, to_s
     out_prefix = str(Path(store["output_dir"]).expanduser() / f"{q.file_prefix}_{prof.slug}")
     try:
         with engine_logs(quiet, to_stderr):
-            print(f"\n🎵  semaninha · {prof.name}")
+            print(f"\nsemaninha · {prof.name}")
             print("─" * 44)
-            print(f"  📅  {q.describe()}")
+            print(f"  {q.describe()}")
             albums = engine.fetch_albums(prof.lastfm, q.mode)
             if not albums:
                 return RunResult(prof, q, [], {}, {})
@@ -349,7 +349,7 @@ def open_files(paths: list[Path]) -> None:
         return
     opener = "open" if platform.system() == "Darwin" else "xdg-open"
     if shutil.which(opener) is None:
-        print(f"  ⚠️  '{opener}' não encontrado; abra manualmente.", file=sys.stderr)
+        print(f"  aviso: '{opener}' não encontrado; abra manualmente.", file=sys.stderr)
         return
     subprocess.run([opener, *map(str, paths)], check=False)
 
@@ -358,7 +358,7 @@ def print_summary(r: RunResult) -> None:
     title = f"{r.profile.name} · {r.query.describe()}"
     print(f"\n━━ {title}")
     if r.error:
-        print(f"  ❌ {r.error}")
+        print(f"  erro: {r.error}")
         return
     if not r.albums:
         print("  (sem álbuns no período)")
@@ -372,11 +372,11 @@ def print_summary(r: RunResult) -> None:
         for u in r.unmatched:
             print(f"    – {u['artist']} — {u['album']}")
     else:
-        print("  sem rating: nenhum ✨")
+        print("  sem rating: nenhum ")
 
 
 def fail(msg: str, code: int = 2) -> None:
-    print(f"❌  {msg}", file=sys.stderr)
+    print(f"erro: {msg}", file=sys.stderr)
     raise SystemExit(code)
 
 
@@ -409,7 +409,7 @@ def confirm(message: str, default: bool = True) -> bool:
 
 def banner(store: dict) -> None:
     n = len(store["profiles"])
-    print("\n🎵  semaninha  ·  grids do Last.fm com notas do RYM")
+    print("\nsemaninha  ·  grids do Last.fm com notas do RYM")
     print(f"    {n} perfil(is) · saída em {store['output_dir']}\n")
 
 
@@ -464,14 +464,14 @@ def tui_edit_profile(store: dict, current: Profile | None = None) -> Profile | N
     else:
         csv_path = Path(csv).expanduser()
         if not csv_path.is_file():
-            print(f"  ⚠️  {csv_path} não existe ainda; ele é criado na primeira nota.")
+            print(f"  aviso: {csv_path} não existe ainda; ele é criado na primeira nota.")
             if not confirm("Salvar assim mesmo?", default=True):
                 return None
     prof = Profile(name.strip(), lastfm.strip(), rym.strip(), str(csv_path.resolve()))
     upsert_profile(store, prof, old_name=current.name if current else None)
     store["last_profile"] = prof.name
     save_store(store)
-    print(f"  ✅ perfil '{prof.name}' salvo")
+    print(f"  ok perfil '{prof.name}' salvo")
     return prof
 
 
@@ -495,7 +495,7 @@ def tui_profiles(store: dict) -> None:
             if store.get("last_profile") == chosen.name:
                 store["last_profile"] = None
             save_store(store)
-            print(f"  🗑  perfil '{chosen.name}' removido")
+            print(f"  perfil '{chosen.name}' removido")
 
 
 def _validate_dt(v: str):
@@ -584,7 +584,7 @@ def tui_generate(store: dict) -> None:
     q = tui_pick_query(store)
     if q is None:
         return
-    print(f"\n  👤 {prof.name} (@{prof.lastfm})\n  📅 {q.describe()}")
+    print(f"\n  {prof.name} (@{prof.lastfm})\n  {q.describe()}")
     if not confirm("Gerar?", default=True):
         return
     r = run_query(store, prof, q, ask_ratings=tui_ask_ratings)
@@ -645,7 +645,7 @@ def tui_settings(store: dict) -> None:
             open_files([CONFIG_PATH])
             continue
         save_store(store)
-        print("  ✅ salvo")
+        print("  ok salvo")
 
 
 def tui_first_run(store: dict) -> None:
@@ -667,14 +667,14 @@ def tui() -> int:
         tui_first_run(store)
     while True:
         action = select("O que você quer fazer?", [
-            Choice("🎨  Gerar grid", "run"),
-            Choice("👤  Perfis", "profiles"),
-            Choice("🖼   Abrir os últimos grids", "open"),
-            Choice("⚙️   Configurações", "settings"),
+            Choice("Gerar grid", "run"),
+            Choice("Perfis", "profiles"),
+            Choice("Abrir os últimos grids", "open"),
+            Choice("Configurações", "settings"),
             Choice("Sair", "quit"),
         ])
         if action in (None, "quit"):
-            print("  até a próxima 👋")
+            print("  até a próxima ")
             return 0
         {"run": tui_generate, "profiles": tui_profiles, "open": tui_open_latest,
          "settings": tui_settings}[action](store)
@@ -713,7 +713,7 @@ def doctor(store: dict) -> int:
         engine.configure(cjk_font=store.get("cjk_font") or None)
         fonts = engine.load_fonts()
     check("fonte CJK (japonês)", engine._font_renders_japanese(fonts["cjk_md"]), store.get("cjk_font") or "auto")
-    print("\n  tudo certo ✨\n" if ok else "\n  há problemas acima\n")
+    print("\n  tudo certo \n" if ok else "\n  há problemas acima\n")
     return 0 if ok else 1
 
 
@@ -759,7 +759,7 @@ def cmd_run(args: argparse.Namespace, store: dict, dry_run: bool = False) -> int
         for r in results:
             print(f"\n━━ {r.profile.name} · {r.query.describe()}")
             if r.error:
-                print(f"  ❌ {r.error}")
+                print(f"  erro: {r.error}")
             elif not r.albums:
                 print("  (sem álbuns no período)")
             elif r.unmatched:
@@ -768,7 +768,7 @@ def cmd_run(args: argparse.Namespace, store: dict, dry_run: bool = False) -> int
                     print(f"    – {u['artist']} — {u['album']}")
                 print(f'\n  dica: semaninha rate {r.profile.name} "<artista>" "<álbum>" <1-10>')
             else:
-                print(f"  todos os {len(r.albums)} com rating ✨")
+                print(f"  todos os {len(r.albums)} com rating ")
     else:
         for r in results:
             print_summary(r)
@@ -783,7 +783,7 @@ def cmd_rate(args: argparse.Namespace, store: dict) -> int:
     if rating is None:
         fail(f"nota inválida: {args.rating!r} (1–10 em passos de 0.5, ou estrelas como 4.5*)")
     engine.append_rym_rating(str(prof.csv_path), args.artist, args.album, rating)
-    print(f"💾  {prof.name}: {args.artist} — {args.album} → {rating}/10 {engine.rating_to_stars(rating)}"
+    print(f"{prof.name}: {args.artist} — {args.album} → {rating}/10 {engine.rating_to_stars(rating)}"
           f"  ({prof.csv_path.name})")
     return 0
 
@@ -821,7 +821,7 @@ def cmd_open(args: argparse.Namespace, store: dict) -> int:
     files = [f for p in _resolve_profiles(store, args.profiles)
              for f in latest_paths(store, p, args.kind).values()]
     for f in files:
-        print(f"  📂 {f}")
+        print(f"  {f}")
     open_files(files)
     return 0 if files else 1
 

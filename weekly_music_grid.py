@@ -254,7 +254,7 @@ class LastfmError(RuntimeError):
 
 def get_weekly_top_albums(api_key: str, username: str, limit: int = TOP_N) -> list[dict]:
     """Busca os álbuns mais ouvidos no período configurado via Last.fm API."""
-    print(f"  📡 Buscando top {limit} álbuns de @{username} (últimos {PERIOD_DAYS} dias)…")
+    print(f"  Buscando top {limit} álbuns de @{username} (últimos {PERIOD_DAYS} dias)…")
     resp = requests.get(
         "https://ws.audioscrobbler.com/2.0/",
         params={
@@ -373,7 +373,7 @@ def get_top_albums_in_window(
     """
     # 1. Coleta todos os scrobbles do período (paginado)
     from_time, now = window_bounds()
-    print(f"  📡 [{rank_by}] Buscando scrobbles de @{username} "
+    print(f"  [{rank_by}] Buscando scrobbles de @{username} "
           f"({datetime.datetime.fromtimestamp(from_time):%Y-%m-%d %H:%M} → {datetime.datetime.fromtimestamp(now):%Y-%m-%d %H:%M})…")
     scrobbles: list[dict] = []
     page = 1
@@ -417,9 +417,9 @@ def get_top_albums_in_window(
         page += 1
 
     if not scrobbles:
-        print("  ⚠️  Nenhum scrobble encontrado no período.")
+        print("  aviso: Nenhum scrobble encontrado no período.")
         return []
-    print(f"  ✅ {len(scrobbles)} scrobbles carregados")
+    print(f"  ok {len(scrobbles)} scrobbles carregados")
 
     # 2. Conta plays por faixa e coleta melhor cover por álbum
     # key: (norm_artist, norm_track, norm_album) → plays
@@ -447,7 +447,7 @@ def get_top_albums_in_window(
     # duration lookup key is (norm_artist, norm_track) — same for all albums
     dur_cache: dict[tuple, int] = {}   # (norm_artist, norm_track) → seconds
     if rank_by == "time":
-        print(f"  🔍 Buscando duração de {len(unique_artist_track)} faixas únicas "
+        print(f"  Buscando duração de {len(unique_artist_track)} faixas únicas "
               f"({TRACK_INFO_WORKERS} workers)…")
 
     def fetch_dur(tk: tuple) -> tuple[tuple, int]:
@@ -505,7 +505,7 @@ def get_top_albums_in_window(
     top_aks = [ak for ak, _ in sorted_albums[:limit]]
     missing = [ak for ak in top_aks if not album_meta.get(ak, {}).get("cover_url")]
     if missing:
-        print(f"  🖼  Buscando capa via album.getInfo para {len(missing)} álbum(ns) sem imagem…")
+        print(f"  Buscando capa via album.getInfo para {len(missing)} álbum(ns) sem imagem…")
         for ak in missing:
             meta = album_meta.get(ak)
             if not meta:
@@ -618,7 +618,7 @@ def load_rym_ratings(csv_path: str) -> tuple[dict[tuple, str], list[tuple[str, s
     path = Path(csv_path)
 
     if not path.exists():
-        print(f"  ⚠️  CSV do RYM não encontrado em '{csv_path}'. Ratings serão omitidos.")
+        print(f"  aviso: CSV do RYM não encontrado em '{csv_path}'. Ratings serão omitidos.")
         print("      Para exportar: no RYM → Settings → Export Data → Export Ratings")
         return index, rows
 
@@ -817,7 +817,7 @@ def download_cover(url: str, size: int = COVER_SIZE,
     # placeholder se tudo falhar
     img = Image.new("RGB", (size, size), (40, 40, 40))
     draw = ImageDraw.Draw(img)
-    draw.text((size // 2, size // 2), "♪", fill=(80, 80, 80), anchor="mm")
+    draw.text((size // 2, size // 2), "", fill=(80, 80, 80), anchor="mm")
     return img
 
 
@@ -964,9 +964,9 @@ def load_fonts() -> dict:
     cjk_md, _        = load_cjk(15)
 
     if cjk_path and _font_renders_japanese(cjk_sm):
-        print(f"  🔤  Fonte CJK: {cjk_path}")
+        print(f"  Fonte CJK: {cjk_path}")
     else:
-        print("  ⚠️  Nenhuma fonte com suporte a japonês encontrada.")
+        print("  aviso: Nenhuma fonte com suporte a japonês encontrada.")
         print("      Caracteres como ミドリ aparecerão como □.")
         print("      Solução rápida no macOS:")
         print("        brew install --cask font-noto-sans-cjk-japanese")
@@ -1129,7 +1129,7 @@ def build_grid(
         ox  = col * COVER_SIZE
         oy  = row * COVER_SIZE
 
-        print(f"  🖼  Baixando capa: {album['artist']} — {album['name']}")
+        print(f"  Baixando capa: {album['artist']} — {album['name']}")
         cover = download_cover(album["cover_url"],
                                artist=album["artist"],
                                album=album["name"]).convert("RGBA")
@@ -1304,11 +1304,11 @@ def fetch_albums(username: str, mode: str = MODE) -> list[dict]:
         before = len(albums)
         albums = [a for a in albums if keep(a)]
         if before - len(albums):
-            print(f"  🚫  {before - len(albums)} álbum(ns) ocultado(s) por {label}")
+            print(f"  {before - len(albums)} álbum(ns) ocultado(s) por {label}")
 
     albums = albums[:TOP_N]
     if albums:
-        print(f"  ✅  {len(albums)} álbuns encontrados:")
+        print(f"  ok  {len(albums)} álbuns encontrados:")
         for a in albums:
             lead = f"{a['plays']:>4}x" if mode == "scrobbles" else f"{a.get('time_label', '?'):>8}"
             print(f"      {lead}  {a['artist']} — {a['name']}")
@@ -1319,13 +1319,13 @@ def match_ratings(albums: list[dict], csv_path: str) -> tuple[dict, list, dict[i
     """Casa cada álbum com o CSV do RYM. Devolve (index, rows_fb, ratings)."""
     print()
     if not Path(csv_path).is_file():
-        print(f"  📋  CSV de ratings ainda não existe ({csv_path}); seguindo sem notas.")
+        print(f"  CSV de ratings ainda não existe ({csv_path}); seguindo sem notas.")
         return {}, [], {}
-    print(f"  📋  Carregando ratings do RYM de '{csv_path}'…")
+    print(f"  Carregando ratings do RYM de '{csv_path}'…")
     index, rows_fb = load_rym_ratings(csv_path)
-    print(f"  ✅  {len(rows_fb)} álbuns carregados do CSV")
+    print(f"  ok  {len(rows_fb)} álbuns carregados do CSV")
     print()
-    print("  🔍  Matching Last.fm ↔ RYM:")
+    print("  Matching Last.fm ↔ RYM:")
     ratings: dict[int, str] = {}
     for i, a in enumerate(albums):
         rating = find_rating(index, rows_fb, a["artist"], a["name"])
@@ -1334,7 +1334,7 @@ def match_ratings(albums: list[dict], csv_path: str) -> tuple[dict, list, dict[i
             print(f"      ✓  {rating_to_stars(rating) or '':<10} {a['artist']} — {a['name']}")
         else:
             print(f"      —  {'sem rating':<10} {a['artist']} — {a['name']}")
-    print(f"\n  ✅  {len(ratings)}/{len(albums)} álbuns com rating encontrado")
+    print(f"\n  ok  {len(ratings)}/{len(albums)} álbuns com rating encontrado")
     return index, rows_fb, ratings
 
 
@@ -1344,7 +1344,7 @@ def prompt_ratings(albums: list[dict], ratings: dict[int, str], csv_path: str) -
     if not pending:
         return
     print()
-    print("  ✏️   Álbuns sem rating — digite uma nota de 1–10 ou Enter para deixar sem:")
+    print("  Álbuns sem rating — digite uma nota de 1–10 ou Enter para deixar sem:")
     print("       (escala RYM: 10=★★★★★  9=★★★★½  8=★★★★  7=★★★½ ...)")
     print()
     for i in pending:
@@ -1357,15 +1357,15 @@ def prompt_ratings(albums: list[dict], ratings: dict[int, str], csv_path: str) -
             try:
                 val = float(raw)
             except ValueError:
-                print("         ⚠️  Entrada inválida. Digite um número (ex: 8) ou Enter.")
+                print("         aviso: Entrada inválida. Digite um número (ex: 8) ou Enter.")
                 continue
             if 1 <= val <= 10:
                 ratings[i] = raw
                 print(f"         → {rating_to_stars(raw)}")
                 append_rym_rating(csv_path, a["artist"], a["name"], raw)
-                print(f"         💾 Salvo em '{csv_path}'")
+                print(f"         Salvo em '{csv_path}'")
                 break
-            print("         ⚠️  Digite um número entre 1 e 10.")
+            print("         aviso: Digite um número entre 1 e 10.")
 
 
 def render(albums: list[dict], index: dict, rows_fb: list, ratings: dict[int, str],
@@ -1379,17 +1379,17 @@ def render(albums: list[dict], index: dict, rows_fb: list, ratings: dict[int, st
     if mode == "listening_time":
         for label, show_time in (("timed", True), ("plain", False)):
             path = f"{base}_timed.png" if show_time else f"{base}.png"
-            print(f"  🖼   Montando grid ({'com' if show_time else 'sem'} tempo)…")
+            print(f"  Montando grid ({'com' if show_time else 'sem'} tempo)…")
             img = build_grid(albums, index, rows_fb, manual_ratings=ratings,
                              mode=mode, show_time_label=show_time)
             img.save(path)
-            print(f"  ✅  Salvo: {path}")
+            print(f"  ok  Salvo: {path}")
             paths[label] = str(Path(path).resolve())
     else:
         path = f"{base}.png"
-        print("  🖼   Montando grid…")
+        print("  Montando grid…")
         build_grid(albums, index, rows_fb, manual_ratings=ratings, mode=mode).save(path)
-        print(f"  ✅  Salvo: {path}")
+        print(f"  ok  Salvo: {path}")
         paths["plain"] = str(Path(path).resolve())
     return paths
 
@@ -1402,17 +1402,17 @@ def generate(username: str, csv_path: str, output: str, mode: str = MODE,
     Levanta LastfmError se a API falhar; devolve albums=[] se não houver scrobbles.
     """
     print()
-    print("🎵  Weekly Music Grid")
+    print("Weekly Music Grid")
     print("─" * 44)
     w_from, w_to = window_bounds()
-    print(f"  👤  @{username}  |  grid {COLUMNS}×{math.ceil(TOP_N / COLUMNS)} (top {TOP_N})  |  CSV: {csv_path}")
-    print(f"  📅  {datetime.datetime.fromtimestamp(w_from):%d/%m/%Y %H:%M} → "
+    print(f"  @{username}  |  grid {COLUMNS}×{math.ceil(TOP_N / COLUMNS)} (top {TOP_N})  |  CSV: {csv_path}")
+    print(f"  {datetime.datetime.fromtimestamp(w_from):%d/%m/%Y %H:%M} → "
           f"{datetime.datetime.fromtimestamp(w_to + 1):%d/%m/%Y %H:%M}")
 
     albums = fetch_albums(username, mode)
     period = next((k for k, v in _PERIOD_PRESETS.items() if v["days"] == PERIOD_DAYS), "week")
     if not albums:
-        print("  ⚠️  Nenhum álbum encontrado no período.")
+        print("  aviso: Nenhum álbum encontrado no período.")
         return GridResult(username, csv_path, period, mode, [], {})
 
     index, rows_fb, ratings = match_ratings(albums, csv_path)
@@ -1423,7 +1423,7 @@ def generate(username: str, csv_path: str, output: str, mode: str = MODE,
     if interactive and sys.stdin.isatty():
         prompt_ratings(albums, ratings, csv_path)
     elif result.unmatched:
-        print(f"  ⏭️   {len(result.unmatched)} álbum(ns) sem rating (sem estrelas)")
+        print(f"  {len(result.unmatched)} álbum(ns) sem rating (sem estrelas)")
 
     result.paths = render(albums, index, rows_fb, ratings, output, mode)
     print()
@@ -1438,7 +1438,7 @@ def main():
     if args.add_rating:
         artist, album, rating = args.add_rating
         append_rym_rating(args.csv, artist, album, rating)
-        print(f"💾  Salvo: {artist} — {album} → {rating}  em '{args.csv}'")
+        print(f"Salvo: {artist} — {album} → {rating}  em '{args.csv}'")
         return
 
     try:
@@ -1446,7 +1446,7 @@ def main():
                           interactive=not args.non_interactive and not args.list_unmatched,
                           dry_run=args.list_unmatched)
     except LastfmError as e:
-        print(f"  ❌ Erro Last.fm: {e}")
+        print(f"  erro: Erro Last.fm: {e}")
         sys.exit(1)
 
     if not result.albums:

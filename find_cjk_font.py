@@ -9,7 +9,7 @@ Uso:
     python find_cjk_font.py
 
 Saída:
-    - Lista de fontes testadas com ✅ (funciona) ou ❌ (quadradinhos)
+    - Lista de fontes testadas com ok (funciona) ou erro: (quadradinhos)
     - Imagem cjk_font_test.png com amostra visual de cada fonte
     - Instrução de qual caminho colocar em CJK_FONT_PATH no script principal
 """
@@ -103,13 +103,13 @@ for path in dict.fromkeys(candidates):   # deduplica mantendo ordem
         ok   = font_renders_japanese(font)
         if ok:
             working.append((path, font))
-            print(f"  ✅  {path}")
+            print(f"  ok  {path}")
         else:
             broken.append(path)
-            print(f"  ❌  {path}  (carregou mas não tem glyphs japoneses)")
+            print(f"  erro: {path}  (carregou mas não tem glyphs japoneses)")
     except Exception as e:
         broken.append(path)
-        print(f"  ❌  {path}  (erro: {e})")
+        print(f"  erro: {path}  (erro: {e})")
 
 print(f"\n  {len(missing)} caminhos não encontrados no sistema (normal)")
 
@@ -142,7 +142,7 @@ if working:
     img.save(out)
     print(f"\n  Amostra visual salva em: {out}")
 else:
-    print("\n  ⚠️  Nenhuma fonte funcional encontrada.")
+    print("\n  aviso: Nenhuma fonte funcional encontrada.")
 
 # ── recomendação ─────────────────────────────────────────────
 

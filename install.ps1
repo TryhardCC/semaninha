@@ -8,7 +8,7 @@
 $ErrorActionPreference = "Stop"
 $Source = if ($env:SEMANINHA_SOURCE) { $env:SEMANINHA_SOURCE } else { "git+https://github.com/TryhardCC/semaninha" }
 
-Write-Host "`n🎵  Instalando o semaninha" -ForegroundColor Yellow
+Write-Host "`nInstalando o semaninha" -ForegroundColor Yellow
 
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     Write-Host "  baixando o uv…"
@@ -34,6 +34,6 @@ pause
 "@ | Set-Content -Path $Launcher -Encoding ASCII
 Write-Host "  ✓ atalho criado: $Launcher"
 
-Write-Host "`nPronto! 🎉  Dê dois cliques em 'Semaninha' na Área de Trabalho, ou abra um terminal novo e digite: semaninha`n"
+Write-Host "`nPronto! Dê dois cliques em 'Semaninha' na Área de Trabalho, ou abra um terminal novo e digite: semaninha`n"
 Write-Host "Na primeira vez ele pede a chave do Last.fm (grátis em https://www.last.fm/api/account/create) e os dados do perfil."
 Read-Host "Pressione Enter para fechar"

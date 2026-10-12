@@ -21,7 +21,7 @@ say()  { printf '\n\033[1m%s\033[0m\n' "$1"; }
 ok()   { printf '  ✓ %s\n' "$1"; }
 warn() { printf '  ! %s\n' "$1"; }
 
-say "🎵  Instalando o semaninha"
+say "Instalando o semaninha"
 
 # ── 1. uv ────────────────────────────────────────────────────
 if ! command -v uv >/dev/null 2>&1 && [ ! -x "$BIN_DIR/uv" ]; then
@@ -85,7 +85,7 @@ EOF
   ok "atalho criado: $LAUNCHER"
 fi
 
-say "Pronto! 🎉"
+say "Pronto! "
 printf '  • Dê dois cliques em "Semaninha" na Mesa, ou\n'
 printf '  • abra um Terminal novo e digite:  semaninha\n\n'
 printf '  Na primeira vez ele pede a chave do Last.fm (grátis em https://www.last.fm/api/account/create)\n'

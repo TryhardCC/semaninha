@@ -14,6 +14,6 @@ chmod +x "$STAGE/install.sh" "$STAGE/Instalar.command"
 rm -f dist/semaninha.zip
 (cd "$(dirname "$STAGE")" && zip -qr "$OLDPWD/dist/semaninha.zip" semaninha -x '*.DS_Store')
 rm -rf "$(dirname "$STAGE")"
-echo "✅  dist/semaninha.zip ($(du -h dist/semaninha.zip | cut -f1))"
+echo "ok  dist/semaninha.zip ($(du -h dist/semaninha.zip | cut -f1))"
 echo "    Quem receber: descompacta e dá dois cliques em Instalar.command (macOS)"
 echo "    ou botão direito → Executar com o PowerShell em install.ps1 (Windows)."

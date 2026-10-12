@@ -43,10 +43,10 @@ Abre o menu. Na primeira vez ele pede a chave da API do Last.fm (grátis em last
 
 ```
 ? O que você quer fazer?
- » 🎨  Gerar grid
-   👤  Perfis
-   🖼   Abrir os últimos grids
-   ⚙️   Configurações
+ » Gerar grid
+   Perfis
+   Abrir os últimos grids
+   Configurações
    Sair
 ```
 
