@@ -35,15 +35,37 @@ ok "uv $(uv --version | cut -d' ' -f2)"
 # ── 2. semaninha ─────────────────────────────────────────────
 # Se este script está dentro da pasta do projeto (zip), instala dela; senão, do GitHub.
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || echo "")"
+EDITABLE=""
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/pyproject.toml" ] && [ -f "$SCRIPT_DIR/semaninha.py" ]; then
   SOURCE="$SCRIPT_DIR"
-  printf '  instalando a partir da pasta local…\n'
+  if [ -d "$SCRIPT_DIR/.git" ]; then
+    EDITABLE="--editable"     # pasta de desenvolvimento: mudanças nos .py valem sem reinstalar
+    printf '  instalando em modo editável a partir da pasta do projeto…\n'
+  else
+    printf '  instalando a partir da pasta local…\n'
+  fi
 else
   SOURCE="$GITHUB_SOURCE"
   printf '  instalando a partir do GitHub…\n'
 fi
-uv tool install --force --quiet --python '>=3.11' "$SOURCE"
+uv tool install --force --reinstall --no-cache --quiet --python '>=3.11' $EDITABLE "$SOURCE"
 ok "comando 'semaninha' instalado em $BIN_DIR"
+
+# garante ~/.local/bin no PATH do shell, para quem for usar o Terminal
+# (uv tool update-shell só age quando o PATH atual ainda não tem a pasta)
+uv tool update-shell >/dev/null 2>&1 || true
+PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+case "$(basename "${SHELL:-zsh}")" in
+  zsh)  RC_FILES="$HOME/.zshrc" ;;
+  bash) RC_FILES="$HOME/.bashrc $HOME/.bash_profile" ;;
+  *)    RC_FILES="" ;;
+esac
+for rc in $RC_FILES; do
+  if ! grep -qs '^[^#]*\.local/bin' "$rc"; then
+    printf '\n# semaninha (comandos instalados pelo uv)\n%s\n' "$PATH_LINE" >> "$rc"
+    ok "PATH adicionado em $rc"
+  fi
+done
 
 # garante o PATH nos shells (zsh/bash/fish) para quem for usar o Terminal
 uv tool update-shell >/dev/null 2>&1 || true
@@ -87,7 +109,7 @@ fi
 
 say "Pronto! "
 printf '  • Dê dois cliques em "Semaninha" na Mesa, ou\n'
-printf '  • abra um Terminal novo e digite:  semaninha\n\n'
+printf '  • abra um Terminal NOVO (feche o atual) e digite:  semaninha\n\n'
 printf '  Na primeira vez ele pede a chave do Last.fm (grátis em https://www.last.fm/api/account/create)\n'
 printf '  e os dados do seu perfil: usuário do Last.fm, usuário do RateYourMusic e o CSV exportado do RYM\n'
 printf '  (RYM → Settings → Export Data → Export ratings).\n\n'
