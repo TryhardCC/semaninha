@@ -1,0 +1,11 @@
+*.csv
+*.csv.bak
+*.egg-info/
+*.png
+.DS_Store
+.venv/
+.weekly_grid_last_success
+__pycache__/
+dist/
+out/
+venv/
