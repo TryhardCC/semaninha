@@ -34,7 +34,10 @@ ok "uv $(uv --version | cut -d' ' -f2)"
 
 # ── 2. semaninha ─────────────────────────────────────────────
 # Se este script está dentro da pasta do projeto (zip), instala dela; senão, do GitHub.
-SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || echo "")"
+# Só considera "pasta local" quando $0 é um arquivo de verdade (sh install.sh / duplo clique).
+# Via `curl | sh`, $0 é "sh" e a instalação vem do GitHub, independente da pasta atual.
+SCRIPT_DIR=""
+[ -f "$0" ] && SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || echo "")"
 EDITABLE=""
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/pyproject.toml" ] && [ -f "$SCRIPT_DIR/semaninha.py" ]; then
   SOURCE="$SCRIPT_DIR"
