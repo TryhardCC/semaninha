@@ -81,7 +81,7 @@ WINDOW_TO:   int | None = None
 # "listening_time" → top N álbuns por tempo total de escuta
 MODE = "listening_time"
 
-CJK_FONT_PATH = "/Users/lucas.melo/Library/Fonts/NotoSansCJKjp-Regular.otf"
+CJK_FONT_PATH = ""   # a CLI passa a fonte do config; vazio = auto-detectar
 
 # (só para o modo listening_time)
 # Duração padrão em segundos usada quando a faixa não tem duração no Last.fm
