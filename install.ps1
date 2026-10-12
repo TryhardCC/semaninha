@@ -54,11 +54,22 @@ if ($UserPath -notlike "*$BinDir*") {
 # -- 3. atalho na Area de Trabalho ------------------------------------
 $Desktop = [Environment]::GetFolderPath("Desktop")
 $Launcher = Join-Path $Desktop "Semaninha.bat"
+# Chama o .exe pelo caminho completo: um `semaninha` solto resolveria para este proprio
+# Semaninha.bat (o cmd procura na pasta atual primeiro) e entraria em recursao.
 @"
 @echo off
 chcp 65001 >nul
-set PATH=%USERPROFILE%\.local\bin;%PATH%
-semaninha
+cd /d "%USERPROFILE%"
+set "SEMANINHA_EXE=%USERPROFILE%\.local\bin\semaninha.exe"
+if not exist "%SEMANINHA_EXE%" (
+  echo Nao encontrei %SEMANINHA_EXE%
+  echo Rode o instalador de novo: powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/TryhardCC/semaninha/main/install.ps1 | iex"
+  echo.
+  pause
+  exit /b 1
+)
+"%SEMANINHA_EXE%"
+echo.
 pause
 "@ | Set-Content -Path $Launcher -Encoding ASCII
 Write-Host "  ok atalho criado: $Launcher"
