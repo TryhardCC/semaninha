@@ -13,7 +13,7 @@
 
 set -eu
 
-GITHUB_SOURCE="${SEMANINHA_SOURCE:-git+https://github.com/TryhardCC/semaninha}"
+GITHUB_SOURCE="${SEMANINHA_SOURCE:-https://github.com/TryhardCC/semaninha/archive/refs/heads/main.zip}"   # zip do repo: não precisa de git
 BIN_DIR="$HOME/.local/bin"
 CONFIG_DIR="$HOME/.config/semaninha"
 

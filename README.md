@@ -11,13 +11,21 @@ Não precisa ter Python instalado: o instalador baixa o [uv](https://docs.astral
 **Recebeu o zip?**
 1. Descompacte.
 2. **macOS:** dois cliques em `Instalar.command`. Se o macOS disser que "não pode ser aberto", clique com o botão direito → *Abrir*.
-   **Windows:** botão direito em `install.ps1` → *Executar com o PowerShell*.
+   **Windows:** botão direito em `install.ps1` → *Executar com o PowerShell*. Se o Windows bloquear, use a linha de comando da seção abaixo.
 3. Vai aparecer um atalho **Semaninha** na Mesa. Dois cliques nele abre o programa. Também dá pra abrir um Terminal e digitar `semaninha`.
 
-**Pelo Terminal (macOS/Linux), uma linha:**
+**Pela internet, uma linha (sem baixar zip):**
+
+macOS/Linux, no Terminal:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TryhardCC/semaninha/main/install.sh | sh
+```
+
+Windows, no CMD ou no PowerShell:
+
+```
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/TryhardCC/semaninha/main/install.ps1 | iex"
 ```
 
 Na primeira vez o programa pede a chave da API do Last.fm (grátis, 1 minuto em last.fm/api/account/create) e cria o primeiro perfil.
