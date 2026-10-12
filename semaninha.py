@@ -75,7 +75,6 @@ DEFAULT_STORE: dict = {
 class Profile:
     name:   str
     lastfm: str
-    rym:    str
     csv:    str
 
     @property
@@ -87,7 +86,7 @@ class Profile:
         return "".join(c for c in self.lastfm.lower() if c.isalnum() or c in "-_") or self.name
 
     def label(self) -> str:
-        return f"{self.name}  (@{self.lastfm} · RYM {self.rym} · {self.csv_path.name})"
+        return f"{self.name}  (@{self.lastfm} · {self.csv_path.name})"
 
 
 def load_store() -> dict:
@@ -107,13 +106,13 @@ def save_store(store: dict) -> None:
 
 
 def profiles(store: dict) -> list[Profile]:
-    return [Profile(**{k: p.get(k, "") for k in ("name", "lastfm", "rym", "csv")}) for p in store["profiles"]]
+    return [Profile(**{k: p.get(k, "") for k in ("name", "lastfm", "csv")}) for p in store["profiles"]]
 
 
 def find_profile(store: dict, name: str) -> Profile | None:
     n = name.lower()
     for p in profiles(store):
-        if n in (p.name.lower(), p.lastfm.lower(), p.rym.lower()):
+        if n in (p.name.lower(), p.lastfm.lower()):
             return p
     return None
 
@@ -233,7 +232,7 @@ class RunResult:
                 for i, a in enumerate(self.albums) if i not in self.ratings]
 
     def to_json(self) -> dict:
-        d = {"profile": self.profile.name, "lastfm": self.profile.lastfm, "rym": self.profile.rym,
+        d = {"profile": self.profile.name, "lastfm": self.profile.lastfm,
              "csv": str(self.profile.csv_path),
              "window": {"start": self.query.start.strftime(DT_FMT), "end": self.query.end.strftime(DT_FMT)},
              "grid": {"rows": self.query.rows, "columns": self.query.columns, "albums": self.query.top_n},
@@ -444,10 +443,6 @@ def tui_edit_profile(store: dict, current: Profile | None = None) -> Profile | N
     lastfm = text("Usuário do Last.fm:", default=current.lastfm if current else "", validate=_validate_nonempty)
     if lastfm is None:
         return None
-    rym = text("Chave/usuário do RateYourMusic:", default=current.rym if current else lastfm,
-               validate=_validate_nonempty)
-    if rym is None:
-        return None
     downloads = Path.home() / "Downloads"
     csv_default = current.csv if current else (str(downloads) + "/" if downloads.is_dir() else "")
     print("  O CSV é o export do RateYourMusic (Settings → Export Data → Export ratings).")
@@ -467,7 +462,7 @@ def tui_edit_profile(store: dict, current: Profile | None = None) -> Profile | N
             print(f"  aviso: {csv_path} não existe ainda; ele é criado na primeira nota.")
             if not confirm("Salvar assim mesmo?", default=True):
                 return None
-    prof = Profile(name.strip(), lastfm.strip(), rym.strip(), str(csv_path.resolve()))
+    prof = Profile(name.strip(), lastfm.strip(), str(csv_path.resolve()))
     upsert_profile(store, prof, old_name=current.name if current else None)
     store["last_profile"] = prof.name
     save_store(store)

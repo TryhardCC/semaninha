@@ -52,7 +52,7 @@ Abre o menu. Na primeira vez ele pede a chave da API do Last.fm (grátis em last
 
 **Gerar grid** → escolhe o perfil → escolhe o período → confirma. Se sobrarem álbuns sem nota, pergunta se quer dar as notas na hora (vão pro CSV do perfil). No fim oferece abrir as imagens.
 
-**Perfis** guardam: apelido, usuário do Last.fm, chave/usuário do RYM e o caminho do CSV exportado do RYM. O último perfil usado já vem selecionado.
+**Perfis** guardam: apelido, usuário do Last.fm e o caminho do CSV exportado do RYM. O último perfil usado já vem selecionado.
 
 **Períodos**
 
@@ -88,7 +88,7 @@ semaninha doctor                   # checa config, CSVs, Last.fm e fonte CJK
 semaninha config                   # caminho do arquivo de configuração
 ```
 
-`--grid` é sempre `LINHASxCOLUNAS` (ex.: `4x6` = 24 álbuns). Um perfil pode ser chamado pelo apelido, pelo usuário do Last.fm ou pelo do RYM.
+`--grid` é sempre `LINHASxCOLUNAS` (ex.: `4x6` = 24 álbuns). Um perfil pode ser chamado pelo apelido ou pelo usuário do Last.fm.
 
 ---
 
